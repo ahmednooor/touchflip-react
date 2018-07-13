@@ -146,14 +146,6 @@ class TouchFlip extends Component {
         }
     }
 
-    // onClickFlipHandler = (event) => {
-    //     if (!event.target.getAttribute('data-noflip')) {
-    //         event.preventDefault();
-    //         event.stopPropagation();
-    //         this.flip();
-    //     }
-    // }
-
     swipeFlags = {
         locked: false,
         x1: null,
@@ -168,6 +160,14 @@ class TouchFlip extends Component {
     }
 
     swipeStart = (event) => {
+        this.swipeFlags = {
+            locked: false,
+            x1: null,
+            y1: null,
+            isFlipped: false,
+            isSwiped: false
+        };
+
         if (!event.target.getAttribute('data-noflip')) {
             event.preventDefault();
             event.stopPropagation();
@@ -188,7 +188,7 @@ class TouchFlip extends Component {
             const y2 = this.unify(event).screenY;
 
             if (this.state.flipOrientation === 'horizontal') {
-                if (x2 - this.swipeFlags.x1 > 60 
+                if (x2 - this.swipeFlags.x1 > 40 
                         && !this.swipeFlags.isFlipped) {
                     this.swipeFlags.isFlipped = true;
                     this.setState({
@@ -196,7 +196,7 @@ class TouchFlip extends Component {
                     }, this.flip);
                 }
 
-                if (x2 - this.swipeFlags.x1 < -60 
+                if (x2 - this.swipeFlags.x1 < -40 
                         && !this.swipeFlags.isFlipped) {
                     this.swipeFlags.isFlipped = true;
                     this.setState({
@@ -205,7 +205,7 @@ class TouchFlip extends Component {
                 }
             }
             else if (this.state.flipOrientation === 'vertical') {
-                if (y2 - this.swipeFlags.y1 > 60 
+                if (y2 - this.swipeFlags.y1 > 40 
                         && !this.swipeFlags.isFlipped) {
                     this.swipeFlags.isFlipped = true;
                     this.setState({
@@ -213,7 +213,7 @@ class TouchFlip extends Component {
                     }, this.flip);
                 }
 
-                if (y2 - this.swipeFlags.y1 < -60 
+                if (y2 - this.swipeFlags.y1 < -40 
                         && !this.swipeFlags.isFlipped) {
                     this.swipeFlags.isFlipped = true;
                     this.setState({

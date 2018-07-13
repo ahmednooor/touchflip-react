@@ -37,9 +37,10 @@ class App extends Component {
 				onFrontSideShown={() => {}} // callback after flipping to front side
 
 				style={{ // you can use custom styles here
+					// width, height etc.
+					// do not override the position attribute
 				}}
 				className="touchflip-main-ctr" // or you can use classes instead
-				// ^ do not override position attribute
 
 				front={ // markup/jsx for the front side
 					<div className="side front-side-ctr">
