@@ -8,7 +8,7 @@
     "prop-types": "^15.6.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "touchflip-react": "*",
+    "touchflip-react": "link:..",
     "react-scripts": "^1.1.1"
   },
   "scripts": {
