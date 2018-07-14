@@ -77,7 +77,7 @@ class App extends Component {
 			<br className="hide-sm"/>
 			<br className="hide-sm"/>
 			<p className="footer-text">
-				Read Documentation on <strong><a href="https://github.com/ahmednooor/">Github</a></strong>
+				Read Documentation on <strong><a href="https://github.com/ahmednooor/touchflip-react">Github</a></strong>
 			</p>
 			<br />
 			<br />

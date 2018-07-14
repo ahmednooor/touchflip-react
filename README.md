@@ -44,8 +44,10 @@ class Example extends Component { render () { return (
         // ^ can be either 'horizontal' or 'vertical'
 
         defaultFlipDirection={true}
-        // ^ if true, rotates left to right horizontally and down to up vertically
-        // ^ if false, rotates right to left horizontally and up to down vertically
+        // ^ if true, rotates left to right horizontally 
+        //   and down to up vertically
+        // ^ if false, rotates right to left horizontally 
+        //   and up to down vertically
 
         onBackSideShown={() => {}} 
         // ^ callback after flipping to back side

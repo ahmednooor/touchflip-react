@@ -174,6 +174,9 @@ class TouchFlip extends Component {
             this.swipeFlags.x1 = this.unify(event).screenX;
             this.swipeFlags.y1 = this.unify(event).screenY;
             this.swipeFlags.locked = true;
+
+            document.addEventListener('touchend', this.swipeEnd);
+            document.addEventListener('mouseup', this.swipeEnd);
         }
     }
     
@@ -242,6 +245,9 @@ class TouchFlip extends Component {
                 isSwiped: false
             };
         }
+        
+        document.removeEventListener('touchend', this.swipeEnd);
+        document.removeEventListener('mouseup', this.swipeEnd);
     }
 
     render() {
@@ -259,11 +265,11 @@ class TouchFlip extends Component {
 
                 onTouchStart={this.swipeStart}
                 onTouchMove={this.swipeMove}
-                onTouchEnd={this.swipeEnd}
+                // onTouchEnd={this.swipeEnd}
 
                 onMouseDown={this.swipeStart}
                 onMouseMove={this.swipeMove}
-                onMouseUp={this.swipeEnd}
+                // onMouseUp={this.swipeEnd}
             >
                 <TouchFlipSide 
                     perspective={this.state.perspective}
