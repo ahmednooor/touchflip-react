@@ -1,6 +1,6 @@
 {
   "name": "touchflip-react",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A Reusable Flipping Component For ReactJS",
   "author": "ahmednooor",
   "license": "MIT",
@@ -53,5 +53,18 @@
   },
   "files": [
     "dist"
+  ],
+  "keywords": [
+    "touchflip",
+    "react",
+    "reusable",
+    "component",
+    "flipcard",
+    "flashcard",
+    "flipview",
+    "touch",
+    "enabled",
+    "swipe",
+    "flip"
   ]
 }

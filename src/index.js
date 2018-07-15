@@ -150,8 +150,20 @@ class TouchFlip extends Component {
         locked: false,
         x1: null,
         y1: null,
+        _x1: null,
+        _y1: null,
         isFlipped: false,
-        isSwiped: false
+        isSwiped: false,
+        shouldFlip: false,
+        defaultFlipDirection: null,
+        flipDirectionSet: false,
+        frontRotate: null,
+        backRotate: null,
+        duration: null,
+        di: null,
+        df: null,
+        ti: null,
+        tf: null
     }
 
     unify = (e) => {
@@ -159,93 +171,166 @@ class TouchFlip extends Component {
         return e.changedTouches ? e.changedTouches[0] : e 
     }
 
+    speed = (dist, time) => {
+        return dist / time;
+    }
+
     swipeStart = (event) => {
         this.swipeFlags = {
             locked: false,
             x1: null,
             y1: null,
+            _x1: null,
+            _y1: null,
             isFlipped: false,
-            isSwiped: false
+            isSwiped: false,
+            shouldFlip: false,
+            defaultFlipDirection: null,
+            flipDirectionSet: false,
+            frontRotate: null,
+            backRotate: null,
+            duration: null,
+            di: null,
+            df: null,
+            ti: null,
+            tf: null
         };
 
         if (!event.target.getAttribute('data-noflip')) {
             event.preventDefault();
             event.stopPropagation();
             this.swipeFlags.x1 = this.unify(event).screenX;
+            this.swipeFlags._x1 = this.unify(event).screenX;
             this.swipeFlags.y1 = this.unify(event).screenY;
+            this.swipeFlags._y1 = this.unify(event).screenY;
+            this.swipeFlags.di = 
+                this.state.flipOrientation === 'horizontal' ? 
+                    this.unify(event).screenX : this.unify(event).screenY;
+
+            this.swipeFlags.frontRotate = this.state.frontRotate;
+            this.swipeFlags.backRotate = this.state.backRotate;
+            this.swipeFlags.duration = this.state.duration;
+
             this.swipeFlags.locked = true;
 
+            document.addEventListener('touchmove', this.swipeMove);
+            document.addEventListener('mousemove', this.swipeMove);
             document.addEventListener('touchend', this.swipeEnd);
             document.addEventListener('mouseup', this.swipeEnd);
         }
     }
     
     swipeMove = (event) => {
-        if (this.swipeFlags.locked) {
-            this.swipeFlags.isSwiped = true;
-        }
-        if (this.swipeFlags.locked && !event.target.getAttribute('data-noflip')) {
+        if (this.swipeFlags.locked) {            
             event.preventDefault();
             event.stopPropagation();
+
+            this.swipeFlags.isSwiped = true;
+
             const x2 = this.unify(event).screenX;
             const y2 = this.unify(event).screenY;
 
             if (this.state.flipOrientation === 'horizontal') {
-                if (x2 - this.swipeFlags.x1 > 40 
+                if (x2 - this.swipeFlags.x1 > 0 
                         && !this.swipeFlags.isFlipped) {
-                    this.swipeFlags.isFlipped = true;
                     this.setState({
-                        defaultFlipDirection: true
-                    }, this.flip);
+                        duration: 0,
+                        defaultFlipDirection: true,
+                        frontRotate: this.state.frontRotate + parseInt((x2 - this.swipeFlags.x1), 10) / 2,
+                        backRotate: this.state.backRotate + parseInt((x2 - this.swipeFlags.x1), 10) / 2,
+                    });
+                }
+                else if (x2 - this.swipeFlags.x1 < 0 
+                        && !this.swipeFlags.isFlipped) {
+                    this.setState({
+                        duration: 0,
+                        defaultFlipDirection: false,
+                        frontRotate: this.state.frontRotate + parseInt((x2 - this.swipeFlags.x1), 10) / 2,
+                        backRotate: this.state.backRotate + parseInt((x2 - this.swipeFlags.x1), 10) / 2,
+                    });
                 }
 
-                if (x2 - this.swipeFlags.x1 < -40 
-                        && !this.swipeFlags.isFlipped) {
-                    this.swipeFlags.isFlipped = true;
-                    this.setState({
-                        defaultFlipDirection: false
-                    }, this.flip);
-                }
+                this.swipeFlags.shouldFlip = 
+                    this.swipeFlags.flipDirectionSet 
+                    && this.swipeFlags.defaultFlipDirection === this.state.defaultFlipDirection 
+                    && Math.abs(y2 - this.swipeFlags._y1) < 80 ?
+                        true : false;
             }
             else if (this.state.flipOrientation === 'vertical') {
-                if (y2 - this.swipeFlags.y1 > 40 
+                if (y2 - this.swipeFlags.y1 > 0 
                         && !this.swipeFlags.isFlipped) {
-                    this.swipeFlags.isFlipped = true;
                     this.setState({
-                        defaultFlipDirection: false
-                    }, this.flip);
+                        duration: 0,
+                        defaultFlipDirection: false,
+                        frontRotate: this.state.frontRotate - parseInt((y2 - this.swipeFlags.y1), 10) / 2,
+                        backRotate: this.state.backRotate - parseInt((y2 - this.swipeFlags.y1), 10) / 2,
+                    });
+                }
+                else if (y2 - this.swipeFlags.y1 < 0 
+                        && !this.swipeFlags.isFlipped) {
+                    this.setState({
+                        duration: 0,
+                        defaultFlipDirection: true,
+                        frontRotate: this.state.frontRotate - parseInt((y2 - this.swipeFlags.y1), 10) / 2,
+                        backRotate: this.state.backRotate - parseInt((y2 - this.swipeFlags.y1), 10) / 2,
+                    });
                 }
 
-                if (y2 - this.swipeFlags.y1 < -40 
-                        && !this.swipeFlags.isFlipped) {
-                    this.swipeFlags.isFlipped = true;
-                    this.setState({
-                        defaultFlipDirection: true
-                    }, this.flip);
-                }
+                this.swipeFlags.shouldFlip = 
+                    this.swipeFlags.flipDirectionSet 
+                    && this.swipeFlags.defaultFlipDirection === this.state.defaultFlipDirection 
+                    && Math.abs(x2 - this.swipeFlags._x1) < 80 ?
+                        true : false;
             }
+
+            if (!this.swipeFlags.flipDirectionSet) {
+                this.swipeFlags.defaultFlipDirection = this.state.defaultFlipDirection;
+                this.swipeFlags.flipDirectionSet = true;
+            }
+            
+            this.swipeFlags.x1 = x2;
+            this.swipeFlags.y1 = y2;
         }
     }
 
     swipeEnd = (event) => {
-        if (!event.target.getAttribute('data-noflip')) {
-            event.preventDefault();
-            event.stopPropagation();
-            
-            if (!this.swipeFlags.isFlipped
-                    && !this.swipeFlags.isSwiped) {
-                this.flip()
-            }
-
-            this.swipeFlags = {
-                locked: false,
-                x1: null,
-                y1: null,
-                isFlipped: false,
-                isSwiped: false
-            };
-        }
+        event.preventDefault();
+        event.stopPropagation();
+    
+        this.setState({
+            duration: this.swipeFlags.duration,
+            frontRotate: this.swipeFlags.frontRotate,
+            backRotate: this.swipeFlags.backRotate,
+        }, () => {
+            this.swipeFlags.shouldFlip ? this.flip() : null;
+        })
         
+        if (!this.swipeFlags.isSwiped) {
+            this.flip()
+        }
+
+        this.swipeFlags = {
+            locked: false,
+            x1: null,
+            y1: null,
+            _x1: null,
+            _y1: null,
+            isFlipped: false,
+            isSwiped: false,
+            shouldFlip: false,
+            defaultFlipDirection: null,
+            flipDirectionSet: false,
+            frontRotate: null,
+            backRotate: null,
+            duration: null,
+            di: null,
+            df: null,
+            ti: null,
+            tf: null
+        };
+        
+        document.removeEventListener('touchmove', this.swipeMove);
+        document.removeEventListener('mousemove', this.swipeMove);
         document.removeEventListener('touchend', this.swipeEnd);
         document.removeEventListener('mouseup', this.swipeEnd);
     }
@@ -263,13 +348,8 @@ class TouchFlip extends Component {
                 className={this.props.className ? this.props.className : ''}
                 style={style} 
 
-                onTouchStart={this.swipeStart}
-                onTouchMove={this.swipeMove}
-                // onTouchEnd={this.swipeEnd}
-
-                onMouseDown={this.swipeStart}
-                onMouseMove={this.swipeMove}
-                // onMouseUp={this.swipeEnd}
+                onTouchStart={this.state.isFlippable ? this.swipeStart : null}
+                onMouseDown={this.state.isFlippable ? this.swipeStart : null}
             >
                 <TouchFlipSide 
                     perspective={this.state.perspective}
